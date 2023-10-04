@@ -10,11 +10,11 @@ All versions of this software abide by this document.
 **via Discord (preferred)**
 1) Join the Dagda discord using the below URL:
 
-https://discord.gg/vdkPTG6pMB
+    https://discord.gg/vdkPTG6pMB
 
 2) Open a ticket in the support center ticketing channel at the below URL:
 
-https://discord.com/channels/852807566031060992/1114192069716627476
+    https://discord.com/channels/852807566031060992/1114192069716627476
 
 3) In the ticket, mention @sonicscream and add your vulnerability report.
 
