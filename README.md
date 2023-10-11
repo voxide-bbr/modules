@@ -1,5 +1,5 @@
 # Battle Bit modules
-Voxide's modules folder for [RainOrigami's API Runner](https://modules.battlebit.community/).
+Voxide's [modules folder](/voxide-bbr/modules/tree/main/modules) for [RainOrigami's API Runner](https://modules.battlebit.community/).
 
 ## Main branch
 This branch is deployed to the production battle bit api.
