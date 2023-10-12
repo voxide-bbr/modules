@@ -2,7 +2,12 @@ using BattleBitAPI;
 using BattleBitAPI.Common;
 using BBRAPIModules;
 
+using System;
+using static System.Random;
+using System.Reflection;
+using System.Text.Json;
 using System.Numerics;
+using System.IO;
 using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
 using System.Linq;
@@ -10,11 +15,7 @@ using System.Collections.Generic;
 
 using Voxide;
 using static Voxide.Library;
-using System;
-using static System.Random;
 using static Voxide.OpenSimplexNoise;
-using System.Reflection;
-using System.Text.Json;
 using Microsoft.VisualBasic;
 
 namespace Voxide;
