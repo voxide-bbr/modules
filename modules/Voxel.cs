@@ -6,6 +6,7 @@ using System.Numerics;
 using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
 using System.Linq;
+using System.Collections.Generic;
 
 using Voxide;
 using static Voxide.Library;
