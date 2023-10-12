@@ -13,6 +13,8 @@ using System;
 using static System.Random;
 using static Voxide.OpenSimplexNoise;
 using System.Reflection;
+using System.Text.Json;
+using Microsoft.VisualBasic;
 
 namespace Voxide;
 [RequireModule(typeof(Library))]
@@ -164,7 +166,7 @@ public class Voxel : BattleBitModule
             }
             return success;
         }
-        public double GetNoise(OpenSimplexNoise noiseGenerator, int x, int y, int octaves=1, double scale=1.0d, double lacunarity=1.0d, double persistance=1.0d)
+        public double GetNoise(OpenSimplexNoise noiseGenerator, int x, int y, int octaves = 1, double scale = 1.0d, double lacunarity = 1.0d, double persistance = 1.0d)
         {
             // Returns a double between 0 and 1 exclusive if amplitude is 1
             double result = 0;
@@ -172,7 +174,8 @@ public class Voxel : BattleBitModule
             double max = 0;
             double min = 0;
 
-            for (int octave = 0; octave < octaves; octave++) {
+            for (int octave = 0; octave < octaves; octave++)
+            {
                 double frequency = Math.Pow(lacunarity, octave);
                 double amplitude = Math.Pow(persistance, octave);
                 double samplex = (x / scale) * frequency;
@@ -204,8 +207,8 @@ public class Voxel : BattleBitModule
                         z1,
                         Math.Min(
                             z2,
-                            (int) Math.Round(
-                                _noise * Math.Max(Math.Abs(z1-z2),Math.Abs(z2 - z1))
+                            (int)Math.Round(
+                                _noise * Math.Max(Math.Abs(z1 - z2), Math.Abs(z2 - z1))
                                 )
                             )
                         );
@@ -252,6 +255,34 @@ public class Voxel : BattleBitModule
     public static class Utility
     {
         public static Random Random = new();
+        public async static Task<List<Vector3>> LoadVoxelPointsFromJsonFile(string filePath)
+        {
+            try
+            {
+                string jsonString = await File.ReadAllTextAsync(filePath);
+
+                // Parse the JSON array of arrays directly into a List<Vector3>
+                List<List<int>>? _data = JsonSerializer.Deserialize<List<List<int>>>(jsonString);
+                if (_data == null) _data = new();
+                var data = _data.ConvertAll(point => new Vector3(point[0], point[1], point[2]));
+                return data;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine("An error occurred: " + ex.Message);
+                return new();
+            }
+        }
+        public async static Task PlaceMapFile(RunnerServer server, string path, MapVolume volume)
+        {
+            List<Vector3> voxelPoints = await LoadVoxelPointsFromJsonFile(path);
+
+            if (voxelPoints == null) return;
+            foreach (Vector3 point in voxelPoints) {
+                Vector3 position = new Vector3(point.X-256,point.Y-256,point.Z+1);
+                volume.SetVoxel(position, 3);
+            }
+        }
         //                                         volume.SetCuboid(-256, -179, 1, 255, 179, 4, 1);
         public static MapBoundaries FORTIFY = new MapBoundaries(256 * 2, 179 * 2 + 1, 100, -256, -179, 1);
 
@@ -283,7 +314,7 @@ public class Voxel : BattleBitModule
             }
             return Task.CompletedTask;
         }
-        public async static Task SetVoxels(RunnerServer server, MapVolume volume, int mode = 0, int? delay=0, bool immediate=false)
+        public async static Task SetVoxels(RunnerServer server, MapVolume volume, int mode = 0, int? delay = 0, bool immediate = false)
         {
             if (delay != null && delay > 0)
                 await Task.Delay((int)delay);
@@ -336,7 +367,7 @@ public class Voxel : BattleBitModule
     {
         return Voxide.Library.IsVoxelServer(Server);
     }
-    public static async void SpawnVoxelWorld(RunnerServer server, bool immediate=false)
+    public static async void SpawnVoxelWorld(RunnerServer server, bool immediate = false)
     {
         if (IsVoxelServer(server))
         {
@@ -427,7 +458,7 @@ public class Voxel : BattleBitModule
 
                 // Central ring
                 volume.SetSphere(0, 0, 1, radius, 0);
-                volume.SetSphere(0, 0, 1, (int)Math.Round((double)radius/2), 3);
+                volume.SetSphere(0, 0, 1, (int)Math.Round((double)radius / 2), 3);
 
                 // Flag A & C
                 volume.SetSphere(-127, -0, height, radius, 0);
@@ -441,44 +472,11 @@ public class Voxel : BattleBitModule
 
                 await Utility.SetVoxels(server, volume, 1, 0, immediate);
             }
-        } else if (IsDevelopmentServer(server)) //&& server.Map.ToLower().Contains("voxel"))
+        }
+        else if (IsDevelopmentServer(server)) //&& server.Map.ToLower().Contains("voxel"))
         {
-            int octaves = 5;
-            double scale = 20d;
-            double lacunarity = 2d;
-            double persistance = 0.5d;
-
             MapVolume volume = Utility.TRENCH.getMapVolume();
-            // A = -127, 0 | B = 0, 0 | C = 128, 0
-
-            //volume.SetCuboid(-256, -192, 1, 255, 191, 2, 1);
-            //volume.SetCuboid(-192, -128, 1, 191, 127, 5, 3);
-            volume.SetCuboidNoise(-100, -100, 1, 100, 100, 15, 3, octaves, scale, lacunarity, persistance);
-
-            // Spawn to Spawn
-            volume.SetCuboid(-3, -256, 1, 2, 255, 10, 0);
-
-            // Thru flags
-            //volume.SetCuboid(-256, -1, 1, 255, 0, 3, 0);
-
-            // Central ring
-            volume.SetSphere(0, 0, 1, 16, 0);
-            volume.SetSphere(0, 0, 1, 8, 3);
-            //volume.SetCuboid(-256, -256, 4, 255, 255, 16, 0);
-
-            int flagRadius = 25;
-            int flagHeight = 1;
-            //volume.SetSphere(-127, -0, flagHeight, flagRadius, 0);
-            //volume.SetSphere(0, 0, flagHeight, flagRadius, 0);
-            //volume.SetSphere(128, 0, flagHeight, flagRadius, 0);
-
-            // Spawn zones
-
-            volume.SetSphere(0, 219, flagHeight, flagRadius + 1, 3);
-            volume.SetSphere(0, -219, flagHeight, flagRadius + 1, 3);
-            volume.SetSphere(0, 219, flagHeight, flagRadius, 0);
-            volume.SetSphere(0, -219, flagHeight, flagRadius, 0);
-
+            await Utility.PlaceMapFile(server,"./jsonMaps/Hallway.json",volume);
             await Utility.SetVoxels(server, volume, 1, 0, true);
         }
     }
