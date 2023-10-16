@@ -1,6 +1,7 @@
 using BattleBitAPI.Common;
 using BBRAPIModules;
 
+using System;
 using System.Threading.Tasks;
 using System.Linq;
 using System.Numerics;
@@ -12,6 +13,7 @@ using static Voxide.Voxel;
 using Commands;
 using static BattleBitDiscordWebhooks.DiscordWebhooks;
 using BattleBitDiscordWebhooks;
+using System.Diagnostics.CodeAnalysis;
 
 namespace Voxide;
 [RequireModule(typeof(Library))]
@@ -24,13 +26,45 @@ public class Miscellaneous : BattleBitModule
     [ModuleReference]
     public CommandHandler CommandHandler { get; set; } = null!;
     #region Settings
+    public static bool isPeakHours(bool buffer = false) {
+        // Get the current time in UTC
+        DateTime currentTimeUtc = DateTime.UtcNow;
+
+        // 10 AM local time
+        int start = 14;
+
+        // 10 PM local time
+        int end = 2;
+
+        if (buffer) {
+            start += 1;
+            end -= 1;
+        }
+
+        // Actual peak according to data was around 13 PM UTC to 5 AM UTC.
+
+        // Define the start and end times for the range
+        DateTime startTimeUtc = new DateTime(currentTimeUtc.Year, currentTimeUtc.Month, currentTimeUtc.Day, start, 0, 0);
+        DateTime endTimeUtc = new DateTime(currentTimeUtc.Year, currentTimeUtc.Month, currentTimeUtc.Day, end, 0, 0);
+
+        // Check if the current time is within the range
+        if (currentTimeUtc >= startTimeUtc || currentTimeUtc < endTimeUtc)
+            return true;
+        return false;
+    }
     public static int GetSoftPlayers(RunnerServer server)
     {
         if (Voxide.Library.IsDevelopmentServer(server))
             return 0;
         else if (Voxide.Library.IsVoxelServer(server))
+            return 50;
+        else if (Voxide.Library.IsTankServer(server))
+            return 200;
+        else if (Voxide.Library.IsHardcoreServer(server))
             return 100;
-        return 200;
+        else if (Voxide.Library.IsCoreServer(server))
+            return 150;
+        return 100;
     }
     public static string GetSoftPassword(RunnerServer server)
     {
@@ -50,6 +84,11 @@ public class Miscellaneous : BattleBitModule
     public static void UpdateServer(RunnerServer? server)
     {
         if (server == null) return;
+
+        server.ExecuteCommand("setspeedhackdetection false");
+
+        if (isPeakHours() && (server.CurrentPlayerCount + server.InQueuePlayerCount) >= 2) server.ForceStartGame();
+
         if (Voxide.Library.IsDevelopmentServer(server))
         {
             // Everything super fast respawn
@@ -82,9 +121,9 @@ public class Miscellaneous : BattleBitModule
             server.ServerSettings.CanVoteNight = false;
 
             // Dynamic size within limits
-            if (server.CurrentPlayerCount >= 64)
+            if (server.CurrentPlayerCount >= 64 || (isPeakHours(true) && server.CurrentPlayerCount >= 32))
                 server.SetServerSizeForNextMatch(MapSize._127vs127);
-            else if (server.CurrentPlayerCount >= 32)
+            else if (server.CurrentPlayerCount >= 32 || (isPeakHours(true) && server.CurrentPlayerCount >= 16))
                 server.SetServerSizeForNextMatch(MapSize._64vs64);
             else
                 server.SetServerSizeForNextMatch(MapSize._32vs32);
@@ -92,7 +131,7 @@ public class Miscellaneous : BattleBitModule
         else if (Voxide.Library.IsHardcoreServer(server))
         {
             // Damage increase
-            server.ServerSettings.DamageMultiplier = 1.25f;
+            server.ServerSettings.DamageMultiplier = 1.1f;
 
             // Friendly fire
             server.ServerSettings.FriendlyFireEnabled = true;
@@ -103,14 +142,32 @@ public class Miscellaneous : BattleBitModule
             server.ServerSettings.SeaVehicleSpawnDelayMultipler = 0.5f;
             server.ServerSettings.TankSpawnDelayMultipler = 0.5f;
             server.ServerSettings.TransportSpawnDelayMultipler = 2.0f;
+
+            // Dynamic size within limits
+            if (server.CurrentPlayerCount >= 64)
+                server.SetServerSizeForNextMatch(MapSize._127vs127);
+            else if (server.CurrentPlayerCount >= 32)
+                server.SetServerSizeForNextMatch(MapSize._64vs64);
+            else if (server.CurrentPlayerCount >= 16)
+                server.SetServerSizeForNextMatch(MapSize._32vs32);
+            else if (server.CurrentPlayerCount >= 8)
+                server.SetServerSizeForNextMatch(MapSize._16vs16);
+            else
+                server.SetServerSizeForNextMatch(MapSize._8v8);
         }
         else if (Voxide.Library.IsCoreServer(server))
         {
-
-        }
-        else
-        {
-
+            // Dynamic size within limits
+            if (server.CurrentPlayerCount >= 64)
+                server.SetServerSizeForNextMatch(MapSize._127vs127);
+            else if (server.CurrentPlayerCount >= 32)
+                server.SetServerSizeForNextMatch(MapSize._64vs64);
+            else if (server.CurrentPlayerCount >= 16)
+                server.SetServerSizeForNextMatch(MapSize._32vs32);
+            else if (server.CurrentPlayerCount >= 8)
+                server.SetServerSizeForNextMatch(MapSize._16vs16);
+            else
+                server.SetServerSizeForNextMatch(MapSize._8v8);
         }
     }
     public static void UpdatePlayer(RunnerServer? server, RunnerPlayer? player)
@@ -157,11 +214,6 @@ public class Miscellaneous : BattleBitModule
         else if (Library.IsCoreServer(server))
         {
 
-        }
-        else
-        {
-            // This disables speed hack kick, which should be fixed but whatever
-            player.Modifications.RunningSpeedMultiplier = 1.01f;
         }
     }
     #endregion Settings
