@@ -213,7 +213,7 @@ public class Voxel : BattleBitModule
     }
     public override void OnModulesLoaded()
     {
-        if (IsVoxelServer())
+        if (IsVoxelServer() || IsDevelopmentServer(this.Server))
             Statics.Update();
     }
 
