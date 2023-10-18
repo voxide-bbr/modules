@@ -101,7 +101,7 @@ public class Voxel : BattleBitModule
                 // RU Spawn inner clearing
                 v.SetCuboid(-35-5, 178-5, 1, 34+5, 255+5, mapHeight, 0);
                 // RU Spawn inner walls
-                v.SetCuboid(-35, 178, 1, 34, 255+1, mapHeight/2, 3, false, true);
+                v.SetCuboid(-35, 178, 1, 34, 255+1, 1, 3, false, true);
                 // Main hall
                 //v.SetCuboid(-5, 178-10, 1, 4, 178, 10, 0);
                 v.SetCuboid(-5+1, 178-10-1, 1, 4-1, 178-1, (mapHeight/2)-1, 0);
