@@ -108,15 +108,16 @@ public class Voxel : BattleBitModule
                     octaves, scale, lacunarity, persistance, threshold);
                 v.SetOutsideSphere(0, 0, 0, 164, 128, 0, 1, 100, true, true);*/
                 
-                int octaves = 1;
-                double scale = 1000d;
-                double lacunarity = 1.75d;
-                double persistance = 0.75d;
+                int octaves = 5;
+                double scale = 100d; // x / scale
+                double lacunarity = 2d; // frequency ~> (x/scale)*frequency
+                double persistance = 1.0d; // amplitude ~> ((x/scale)*frequency)*amplitude
 
                 int mapHeight = 24;
+                int flagRadius = 24;
 
                 // A = -127, 0 | B = 0, 0 | C = 128, 0
-                v.SetCuboidNoise(-160, -128, 1, 159, 127, mapHeight, 3, octaves, scale, lacunarity, persistance);
+                v.SetCuboidNoise(-160, -160, 1, 159, 159, mapHeight, 3, octaves, scale, lacunarity, persistance);
 
                 // Spawn to Spawn
                 v.SetCuboid(-5, -256, 1, 4, -10, mapHeight*2, 0);
@@ -126,11 +127,11 @@ public class Voxel : BattleBitModule
                 //v.SetCuboid(-256, -1, 1, 255, 0, 3, 0);
 
                 // Central ring
-                v.SetOutsideSphere(0, 0, 1, 20, 5, 0, 1, mapHeight, false, true);
+                v.SetOutsideSphere(0, 0, 1, flagRadius, 5, 0, 1, mapHeight, false, true);
 
                 // Flag A & C
-                v.SetOutsideSphere(-127, 0, 1, 20, 5, 0, 1, mapHeight, false, true);
-                v.SetOutsideSphere(128, 0, 1, 20, 5, 0, 1, mapHeight, false, true);
+                v.SetOutsideSphere(-127, 0, 1, flagRadius, 5, 0, 1, mapHeight, false, true);
+                v.SetOutsideSphere(128, 0, 1, flagRadius, 5, 0, 1, mapHeight, false, true);
                 
                 // Trim map into a circle
                 v.SetOutsideSphere(0, 0, 0, 162, 160, 0, 1, mapHeight, true, true);
@@ -146,28 +147,28 @@ public class Voxel : BattleBitModule
                 // US Spawn outer walls
                 v.SetCuboid(-35-10, -256-10, 1, 34+10, -179+10, mapHeight, 3, false, true);
                 // US Spawn floors
-                //v.SetCuboid(-35-10, -256-10, mapHeight/2, 34+10, -179+10, mapHeight/2, 3);
-                v.SetCuboid(-35-10, -256-10, mapHeight, 34+10, -179+10, mapHeight, 3);
+                v.SetCuboid(-35-10, -256-10, mapHeight/2, 34+10, -179+10, mapHeight/2, 3);
+                //v.SetCuboid(-35-10, -256-10, mapHeight, 34+10, -179+10, mapHeight, 3);
                 // US Spawn inner clearing
-                //v.SetCuboid(-35-5, -256-5, 1, 34+5, -179+5, mapHeight, 0);
+                v.SetCuboid(-35-5, -256-5, 1, 34+5, -179+5, mapHeight/2, 0);
                 // US Spawn inner walls
-                v.SetCuboid(-35, -256-1, 1, 34, -179, mapHeight, 3, false, true);
+                v.SetCuboid(-35, -256-1, 1, 34, -179, 1, 3, false, true);
                 // Main hall
-                v.SetCuboid(-5, -179, 1, 4, -179+10, 10, 0);
-                //v.SetCuboid(-5+1, -179-1, 1, 4-1, -179+10+1, (mapHeight/2)-1, 0);
+                //v.SetCuboid(-5, -179, 1, 4, -179+10, 10, 0);
+                v.SetCuboid(-5+1, -179+1, 1, 4-1, -179+10+1, (mapHeight/2)-1, 0);
                 
                 // RU Spawn outer walls
                 v.SetCuboid(-35-10, 178-10, 1, 34+10, 255+10, mapHeight, 3, false, true);
                 // RU Spawn floors
-                //v.SetCuboid(-35-10, 178-10, mapHeight/2, 34+10, 255+10, mapHeight/2, 3);
-                v.SetCuboid(-35-10, 178-10, mapHeight, 34+10, 255+10, mapHeight, 3);
+                v.SetCuboid(-35-10, 178-10, mapHeight/2, 34+10, 255+10, mapHeight/2, 3);
+                //v.SetCuboid(-35-10, 178-10, mapHeight, 34+10, 255+10, mapHeight, 3);
                 // RU Spawn inner clearing
-                //v.SetCuboid(-35-5, 178-5, 1, 34+5, 255+5, mapHeight, 0);
+                v.SetCuboid(-35-5, 178-5, 1, 34+5, 255+5, mapHeight, 0);
                 // RU Spawn inner walls
-                v.SetCuboid(-35, 178, 1, 34, 255+1, mapHeight, 3, false, true);
+                v.SetCuboid(-35, 178, 1, 34, 255+1, mapHeight/2, 3, false, true);
                 // Main hall
-                v.SetCuboid(-5, 178-10, 1, 4, 178, 10, 0);
-                //v.SetCuboid(-5+1, 178-10-1, 1, 4-1, 178+1, (mapHeight/2)-1, 0);
+                //v.SetCuboid(-5, 178-10, 1, 4, 178, 10, 0);
+                v.SetCuboid(-5+1, 178-10-1, 1, 4-1, 178-1, (mapHeight/2)-1, 0);
 
                 MapVolumeTrenchDevelopment = v;
             }
@@ -671,8 +672,8 @@ public class Voxel : BattleBitModule
         }
         else if (IsDevelopmentServer(server)) //&& server.Map.ToLower().Contains("voxel"))
         {
-            if (server.Gamemode.ToLower().Contains("trench"))
-                await Utility.SetVoxels(server, Statics.MapVolumeTrenchDevelopment, 1, 0, immediate);
+            //if (server.Gamemode.ToLower().Contains("trench"))
+            await Utility.SetVoxels(server, Statics.MapVolumeTrenchDevelopment, 1, 0, immediate);
         }
     }
 }
