@@ -120,8 +120,8 @@ public class Voxel : BattleBitModule
                 v.SetCuboidNoise(-160, -160, 1, 159, 159, mapHeight, 3, octaves, scale, lacunarity, persistance);
 
                 // Spawn to Spawn
-                v.SetCuboid(-5, -256, 1, 4, -10, mapHeight*2, 0);
-                v.SetCuboid(-5, 10, 1, 4, 255, mapHeight*2, 0);
+                //v.SetCuboid(-5, -256, 1, 4, -10, mapHeight*2, 0);
+                //v.SetCuboid(-5, 10, 1, 4, 255, mapHeight*2, 0);
 
                 // Thru flags
                 //v.SetCuboid(-256, -1, 1, 255, 0, 3, 0);
