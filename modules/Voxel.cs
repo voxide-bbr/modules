@@ -213,7 +213,8 @@ public class Voxel : BattleBitModule
     }
     public override void OnModulesLoaded()
     {
-        Statics.Update();
+        if (IsVoxelServer())
+            Statics.Update();
     }
 
     public override Task OnGameStateChanged(GameState oldState, GameState newState)
