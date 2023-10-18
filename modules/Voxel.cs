@@ -40,7 +40,7 @@ public class Voxel : BattleBitModule
         {
             int _threshold = 3;
             bool refresh = VoxelCounter >= _threshold;
-            VoxelCounter = 0;
+            if (refresh) VoxelCounter = 0;
             if (First || refresh) // MapVolumeTrenchProduction
             {
                 MapVolume v = MapBoundariesTrench.getMapVolume();
@@ -208,7 +208,8 @@ public class Voxel : BattleBitModule
 
                 MapVolumeTrenchDevelopment = v;
             }
-            //if (First) First = false;
+            if (First) First = false;
+            VoxelCounter += 1;
         }
     }
     public override void OnModulesLoaded()
