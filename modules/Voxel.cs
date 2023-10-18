@@ -38,7 +38,7 @@ public class Voxel : BattleBitModule
         public static MapVolume MapVolumeFortifyProduction = MapBoundariesFortify.getMapVolume();
         public static void Update(RunnerServer? server=null)
         {
-            int _threshold = 5;
+            int _threshold = 3;
             bool refresh = VoxelCounter >= _threshold;
             VoxelCounter = 0;
             if (First || refresh) // MapVolumeTrenchProduction
@@ -49,7 +49,7 @@ public class Voxel : BattleBitModule
                 double lacunarity = 2d; // frequency ~> (x/scale)*frequency
                 double persistance = 1.0d; // amplitude ~> ((x/scale)*frequency)*amplitude
 
-                int mapHeight = 12;
+                int mapHeight = 24;
                 int flagRadius = 24;
 
                 // A = -127, 0 | B = 0, 0 | C = 128, 0
