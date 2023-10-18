@@ -45,30 +45,66 @@ public class Voxel : BattleBitModule
             {
                 MapVolume v = MapBoundariesTrench.getMapVolume();
                 int octaves = 5;
-                double scale = 20d;
-                double lacunarity = 2d;
-                double persistance = 0.5d;
-                int radius = 16;
-                int height = 1;
+                double scale = 100d; // x / scale
+                double lacunarity = 2d; // frequency ~> (x/scale)*frequency
+                double persistance = 1.0d; // amplitude ~> ((x/scale)*frequency)*amplitude
+
+                int mapHeight = 24;
+                int flagRadius = 24;
+
                 // A = -127, 0 | B = 0, 0 | C = 128, 0
-                //TrenchProduction.SetCuboid(-256, -192, 1, 255, 191, 2, 1);
-                //TrenchProduction.SetCuboid(-192, -128, 1, 191, 127, 5, 3);
-                v.SetCuboidNoise(-192, -128, 1, 191, 127, 15, 3, octaves, scale, lacunarity, persistance);
+                v.SetCuboidNoise(-160, -160, 1, 159, 159, mapHeight, 3, octaves, scale, lacunarity, persistance);
+
                 // Spawn to Spawn
-                v.SetCuboid(-3, -256, 1, 2, 255, 25, 0);
+                //v.SetCuboid(-5, -256, 1, 4, -10, mapHeight*2, 0);
+                //v.SetCuboid(-5, 10, 1, 4, 255, mapHeight*2, 0);
+
                 // Thru flags
-                //TrenchProduction.SetCuboid(-256, -1, 1, 255, 0, 3, 0);
+                //v.SetCuboid(-256, -1, 1, 255, 0, 3, 0);
+
                 // Central ring
-                v.SetSphere(0, 0, 1, radius, 0);
-                v.SetSphere(0, 0, 1, (int)Math.Round((double)radius / 2), 3);
+                v.SetOutsideSphere(0, 0, 1, flagRadius, 5, 0, 1, mapHeight, false, true);
+
                 // Flag A & C
-                v.SetSphere(-127, -0, height, radius, 0);
-                v.SetSphere(128, 0, height, radius, 0);
-                // Spawn zones
-                v.SetSphere(0, 219, height, radius, 3);
-                v.SetSphere(0, -219, height, radius, 3);
-                v.SetSphere(0, 219, height, radius - 1, 0);
-                v.SetSphere(0, -219, height, radius - 1, 0);
+                v.SetOutsideSphere(-127, 0, 1, flagRadius, 5, 0, 1, mapHeight, false, true);
+                v.SetOutsideSphere(128, 0, 1, flagRadius, 5, 0, 1, mapHeight, false, true);
+                
+                // Trim map into a circle
+                v.SetOutsideSphere(0, 0, 0, 162, 160, 0, 1, mapHeight, true, true);
+                
+                // Keep tree away from flags
+                List<Vector2> trees = new()
+                {
+                    new Vector2(-128, 0), new Vector2(0, 0), new Vector2(128, 0)
+                };
+                v.SetCuboidTrees(-128, -128, 2, 127, 127, mapHeight, 3, 3, 0.5d, 2.0d, 0.5d, 0.773d, 15, trees);
+
+                // Spawn zones +1 block border: US = -35, -256 -> 34, -179 | RU = -35, 178 -> 34, 255
+                // US Spawn outer walls
+                v.SetCuboid(-35-10, -256-10, 1, 34+10, -179+10, mapHeight, 3, false, true);
+                // US Spawn floors
+                v.SetCuboid(-35-10, -256-10, mapHeight/2, 34+10, -179+10, mapHeight/2, 3);
+                //v.SetCuboid(-35-10, -256-10, mapHeight, 34+10, -179+10, mapHeight, 3);
+                // US Spawn inner clearing
+                v.SetCuboid(-35-5, -256-5, 1, 34+5, -179+5, mapHeight/2, 0);
+                // US Spawn inner walls
+                v.SetCuboid(-35, -256-1, 1, 34, -179, 1, 3, false, true);
+                // Main hall
+                //v.SetCuboid(-5, -179, 1, 4, -179+10, 10, 0);
+                v.SetCuboid(-5+1, -179+1, 1, 4-1, -179+10+1, (mapHeight/2)-1, 0);
+                
+                // RU Spawn outer walls
+                v.SetCuboid(-35-10, 178-10, 1, 34+10, 255+10, mapHeight, 3, false, true);
+                // RU Spawn floors
+                v.SetCuboid(-35-10, 178-10, mapHeight/2, 34+10, 255+10, mapHeight/2, 3);
+                //v.SetCuboid(-35-10, 178-10, mapHeight, 34+10, 255+10, mapHeight, 3);
+                // RU Spawn inner clearing
+                v.SetCuboid(-35-5, 178-5, 1, 34+5, 255+5, mapHeight, 0);
+                // RU Spawn inner walls
+                v.SetCuboid(-35, 178, 1, 34, 255+1, mapHeight/2, 3, false, true);
+                // Main hall
+                //v.SetCuboid(-5, 178-10, 1, 4, 178, 10, 0);
+                v.SetCuboid(-5+1, 178-10-1, 1, 4-1, 178-1, (mapHeight/2)-1, 0);
                 MapVolumeTrenchProduction = v;
             }
             if (First || refresh) // MapVolumeFortifyProduction
