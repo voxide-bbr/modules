@@ -47,10 +47,10 @@ public class Voxel : BattleBitModule
                 int octaves = 5;
                 double scale = 100d; // x / scale
                 double lacunarity = 2d; // frequency ~> (x/scale)*frequency
-                double persistance = 1.0d; // amplitude ~> ((x/scale)*frequency)*amplitude
+                double persistance = 0.95d; // amplitude ~> ((x/scale)*frequency)*amplitude
 
-                int mapHeight = 24;
-                int flagRadius = 24;
+                int mapHeight = 20;
+                int flagRadius = 25;
 
                 // A = -127, 0 | B = 0, 0 | C = 128, 0
                 v.SetCuboidNoise(-160, -160, 1, 159, 159, mapHeight, 3, octaves, scale, lacunarity, persistance);
@@ -77,7 +77,7 @@ public class Voxel : BattleBitModule
                 {
                     new Vector2(-128, 0), new Vector2(0, 0), new Vector2(128, 0)
                 };
-                v.SetCuboidTrees(-128, -128, 2, 127, 127, mapHeight, 3, 3, 0.5d, 2.0d, 0.5d, 0.773d, 15, trees);
+                v.SetCuboidTrees(-128, -128, 2, 127, 127, mapHeight, 3, 3, 0.5d, 2.0d, 0.5d, 0.773d, 20, trees);
 
                 // Spawn zones +1 block border: US = -35, -256 -> 34, -179 | RU = -35, 178 -> 34, 255
                 // US Spawn outer walls
