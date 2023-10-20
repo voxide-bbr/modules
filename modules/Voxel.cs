@@ -94,17 +94,17 @@ public class Voxel : BattleBitModule
                 v.SetCuboid(-5 + 1, -179 + 1, 1, 4 - 1, -179 + 10 + 1, (mapHeight / 2) - 1, 0);
 
                 // RU Spawn outer walls
-                v.SetCuboid(-35 - 10, 178 - 10, 1, 34 + 10, 255 + 10, mapHeight, 3, false, true);
+                v.SetCuboid(-35 - 10, 179 - 10, 1, 34 + 10, 255 + 10, mapHeight, 3, false, true);
                 // RU Spawn floors
-                v.SetCuboid(-35 - 10, 178 - 10, mapHeight / 2, 34 + 10, 255 + 10, mapHeight / 2, 3);
+                v.SetCuboid(-35 - 10, 179 - 10, mapHeight / 2, 34 + 10, 255 + 10, mapHeight / 2, 3);
                 //v.SetCuboid(-35-10, 178-10, mapHeight, 34+10, 255+10, mapHeight, 3);
                 // RU Spawn inner clearing
-                v.SetCuboid(-35 - 5, 178 - 5, 1, 34 + 5, 255 + 5, mapHeight, 0);
+                v.SetCuboid(-35 - 5, 179 - 5, 1, 34 + 5, 255 + 5, mapHeight, 0);
                 // RU Spawn inner walls
-                v.SetCuboid(-35, 178, 1, 34, 255 + 1, 1, 3, false, true);
+                v.SetCuboid(-35, 179, 1, 34, 255 + 1, 1, 3, false, true);
                 // Main hall
                 //v.SetCuboid(-5, 178-10, 1, 4, 178, 10, 0);
-                v.SetCuboid(-5 + 1, 178 - 10 - 1, 1, 4 - 1, 178 - 1, (mapHeight / 2) - 1, 0);
+                v.SetCuboid(-5 + 1, 179 - 10 - 1, 1, 4 - 1, 179 - 1, (mapHeight / 2) - 1, 0);
                 MapVolumeTrenchProduction = v;
             }
             if (First || refresh) // MapVolumeFortifyProduction
