@@ -185,6 +185,9 @@ public class Miscellaneous : BattleBitModule
         }
         else if (Voxide.Library.IsVoxelServer(server))
         {
+            if (server.CurrentPlayerCount <= 64)
+                player.Modifications.KillFeed = true;
+                
             // Restrict vehicles that can be entered into
             player.Modifications.AllowedVehicles = (VehicleType.All ^ VehicleType.Tank);
 
@@ -193,7 +196,8 @@ public class Miscellaneous : BattleBitModule
         }
         else if (Voxide.Library.IsTankServer(server))
         {
-
+            if (server.CurrentPlayerCount <= 64)
+                player.Modifications.KillFeed = true;
         }
         else if (Voxide.Library.IsHardcoreServer(server))
         {
@@ -213,7 +217,8 @@ public class Miscellaneous : BattleBitModule
         }
         else if (Library.IsCoreServer(server))
         {
-
+            if (server.CurrentPlayerCount <= 64)
+                player.Modifications.KillFeed = true;
         }
     }
     #endregion Settings
