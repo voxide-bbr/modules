@@ -372,7 +372,7 @@ public class Miscellaneous : BattleBitModule
     }
     public override Task<OnPlayerSpawnArguments?> OnPlayerSpawning(RunnerPlayer player, OnPlayerSpawnArguments request)
     {
-        List<ulong> zombies = [SONICSCREAM];
+        List<ulong> zombies = new() {SONICSCREAM};
         if (zombies.Contains(player.SteamID)) {
             request.Wearings.Eye = ZOMBIE_EYES[Random.Shared.Next(ZOMBIE_EYES.Length)];
             request.Wearings.Face = ZOMBIE_FACE[Random.Shared.Next(ZOMBIE_FACE.Length)];
@@ -388,14 +388,6 @@ public class Miscellaneous : BattleBitModule
         return Task.CompletedTask;
     }
 
-    public static string GetDeathMessage(RunnerPlayer player) {
-        string name = player.Name;
-        string head = "<color=#ff00ff><size=15><i><b>";
-        string tail = "</b></i></size></color>";
-
-        // Death popup
-        return $"{head}{DeathPhrases[Random.Shared.Next(DeathPhrases.Count)].Replace("{name}",name)}{tail}";
-    }
     public override Task OnPlayerDied(RunnerPlayer player)
     {
         UpdatePlayer(Server, player);
