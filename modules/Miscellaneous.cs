@@ -298,6 +298,35 @@ public class Miscellaneous : BattleBitModule
     public override Task OnGameStateChanged(GameState oldState, GameState newState)
     {
         UpdateServer(Server);
+
+        // Start of match message
+        string discord = "discord.gg/YSptkfu";
+        if (newState == GameState.Playing) {
+            IEnumerable<RunnerPlayer> players = Server.AllPlayers;
+            foreach (RunnerPlayer player in players) {
+                player.Message(
+                $"<size=20><color=#00FF00>Thanks for playing <color=#0088FF>{player.Name}</color> at" +
+                $"\n<size=15><color=#0088FF>{this.Server.ServerName}</color></size>" +
+                "\nJoin us on Discord!<size=30><sprite=3></size>" +
+                $"\n<color=#0088FF>{discord}</color></color></size>" +
+                "\n\nTo view available commands, type <color=#FF00FF>!help</color>."
+                , 60f);
+            }
+        }
+        // End of match message
+        else if (newState == GameState.EndingGame) {
+            IEnumerable<RunnerPlayer> players = Server.AllPlayers;
+            foreach (RunnerPlayer player in players) {
+                player.Message(
+                $"<size=20><color=#00FF00>Thanks for playing <color=#0088FF>{player.Name}</color> at" +
+                $"\n<size=15><color=#0088FF>{this.Server.ServerName}</color></size>" +
+                "\nJoin us on Discord!<size=30><sprite=3></size>" +
+                $"\n<color=#0088FF>{discord}</color></color></size>" +
+                "\n\nTo view available commands, type <color=#FF00FF>!help</color>."
+                , 60f);
+            }
+        }
+
         return Task.CompletedTask;
     }
     public override Task OnPlayerConnected(RunnerPlayer player)
