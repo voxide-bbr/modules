@@ -361,7 +361,7 @@ public class Miscellaneous : BattleBitModule
         UpdatePlayer(Server, player);
         return Task.CompletedTask;
     }
-    public override Task OnTick()
+    /*public override Task OnTick()
     {
         if (Voxide.Library.IsDevelopmentServer(Server))
         {
@@ -378,5 +378,5 @@ public class Miscellaneous : BattleBitModule
             }
         }
         return Task.CompletedTask;
-    }
+    }*/
 }
