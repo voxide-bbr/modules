@@ -362,6 +362,19 @@ public class Miscellaneous : BattleBitModule
 
         return Task.CompletedTask;
     }
+    public async Task GreetPlayer(RunnerPlayer player, float delay=15) {
+        await Task.Delay(5000);
+        string discord = "discord.gg/YSptkfu";
+        try {
+            player.Message(
+            $"<size=20><color=#20FF20>Welcome <color=#0088FF>{player.Name}</color> to" +
+            $"\n<size=15><color=#0088FF>{this.Server.ServerName}</color></size>" +
+            "\nJoin us on Discord:<size=30><sprite=3></size>" +
+            $"\n<color=#0088FF>{discord}</color>" +
+            "\n\nTo view available commands, type <color=#FF00FF>!help</color></size>."
+            , delay);
+        } catch {}
+    }
     public override Task OnPlayerConnected(RunnerPlayer player)
     {
         UpdatePlayer(Server, player);
@@ -371,15 +384,7 @@ public class Miscellaneous : BattleBitModule
         // Player join message
         this.Server.UILogOnServer($"{player.Name} (＋)", 3.0f);
 
-        // Advertisement
-        string discord = "discord.gg/YSptkfu";
-        player.Message(
-        $"<size=20><color=#20FF20>Welcome <color=#0088FF>{player.Name}</color> to" +
-        $"\n<size=15><color=#0088FF>{this.Server.ServerName}</color></size>" +
-        "\nJoin us on Discord:<size=30><sprite=3></size>" +
-        $"\n<color=#0088FF>{discord}</color>" +
-        "\n\nTo view available commands, type <color=#FF00FF>!help</color></size>."
-        , 15f);
+        _ = GreetPlayer(player);
 
         return Task.CompletedTask;
     }
@@ -401,7 +406,7 @@ public class Miscellaneous : BattleBitModule
             request.Wearings.Face = ZOMBIE_FACE[Random.Shared.Next(ZOMBIE_FACE.Length)];
             request.Wearings.Hair = ZOMBIE_HAIR[Random.Shared.Next(ZOMBIE_HAIR.Length)];
             request.Wearings.Skin = ZOMBIE_BODY[Random.Shared.Next(ZOMBIE_BODY.Length)];
-            request.Wearings.Uniform = ZOMBIE_UNIFORM[Random.Shared.Next(ZOMBIE_UNIFORM.Length)];
+            //request.Wearings.Uniform = ZOMBIE_UNIFORM[Random.Shared.Next(ZOMBIE_UNIFORM.Length)];
         }
         return Task.FromResult((OnPlayerSpawnArguments?) request);
     }
