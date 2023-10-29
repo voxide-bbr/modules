@@ -51,7 +51,16 @@ public class Library : BattleBitModule
         if (server.ServerName.Contains("#5")) return true;
         return false;
     }
-    #endregion
+    #endregion Server Checkers
+    #region Helpers
+    public static string FirstToUpper(string s) {
+        try {
+            return $"{s[0].ToString().ToUpper()}{s.Substring(1)}";
+        } catch {
+            return s;
+        }
+    }
+    #endregion Helpers
     #region Classes
     public class Dynamic
     {

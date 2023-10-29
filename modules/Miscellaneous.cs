@@ -85,6 +85,36 @@ public class Miscellaneous : BattleBitModule
     {
         if (server == null) return;
 
+        string grammar = (server.CurrentPlayerCount+server.InQueuePlayerCount) == 1 ? "person" : "people";
+        string discord = "https://discord.gg/YSptkfu";
+        string donate = "https://v.dgd.cx/donate";
+
+        if (Voxide.Library.IsDevelopmentServer(server))
+        {
+            string newText = "<size=60><b><color=pink>This is a testing server!</color></b></size>" +
+                $"<size=30><size=50><b><color=#00FF00>{server.ServerName}</color></size> <sprite=2>" +
+                "\n\n<color=red>XP earned here is not saved to your account.</color>" +
+                "\n\nJoin us on discord!" +
+                $"\n<size=40><color=#00FFFF>{discord} <sprite=3></size>" +
+                "\n\nSupport Voxide <3!" +
+                $"\n<size=40><color=#00FFFF>{donate} <sprite=1></size>" +
+                "\n\nNeed to report an issue? Please reach out to us on our Discord via our <color=#00FFFF>@Modmail</color> bot.<sprite=0>" +
+                $"\n\nThere are currently {server.CurrentPlayerCount + server.InQueuePlayerCount} {grammar} playing {FirstToUpper(server.Gamemode.ToLower())} on {FirstToUpper(server.Map.ToLower())}."
+            ;
+            if (newText != server.LoadingScreenText) server.SetLoadingScreenText(newText);
+        }
+        else {
+            string newText = $"<size=30><size=50><b><color=#00FF00>{server.ServerName}</color></size> <sprite=2>" +
+                "\n\n<color=green>XP earned here is saved to your account.</color>" +
+                "\n\nJoin us on discord!" +
+                $"\n<size=40><color=#00FFFF>{discord} <sprite=3></size>" +
+                "\n\nSupport Voxide <3!" +
+                $"\n\n<size=40><color=#00FFFF>{donate} <sprite=1></size>" +
+                "\n\nNeed to report an issue? Please reach out to us on our Discord via our <color=#00FFFF>@Modmail</color> bot.<sprite=0>" +
+                $"\n\nThere are currently {server.CurrentPlayerCount + server.InQueuePlayerCount} {grammar} playing {FirstToUpper(server.Gamemode.ToLower())} on {FirstToUpper(server.Map.ToLower())}."
+            ;
+            if (newText != server.LoadingScreenText) server.SetLoadingScreenText(newText);
+        }
         server.ExecuteCommand("setspeedhackdetection false");
 
         if (isPeakHours() && (server.CurrentPlayerCount + server.InQueuePlayerCount) >= 2) server.ForceStartGame();
@@ -301,7 +331,8 @@ public class Miscellaneous : BattleBitModule
 
         // Start of match message
         string discord = "discord.gg/YSptkfu";
-        if (newState == GameState.Playing) {
+        string donate = "v.dgd.cx/donate";
+        /*if (newState == GameState.Playing) {
             IEnumerable<RunnerPlayer> players = Server.AllPlayers;
             foreach (RunnerPlayer player in players) {
                 player.Message(
@@ -312,17 +343,19 @@ public class Miscellaneous : BattleBitModule
                 "\n\nTo view available commands, type <color=#FF00FF>!help</color>."
                 , 60f);
             }
-        }
+        }*/
         // End of match message
-        else if (newState == GameState.EndingGame) {
+        if (newState == GameState.EndingGame) {
             IEnumerable<RunnerPlayer> players = Server.AllPlayers;
             foreach (RunnerPlayer player in players) {
-                player.Message(
+                player.Message("\n\n\n\n" + // Because of the feedback buttons
                 $"<size=20><color=#00FF00>Thanks for playing <color=#0088FF>{player.Name}</color> at" +
                 $"\n<size=15><color=#0088FF>{this.Server.ServerName}</color></size>" +
-                "\nJoin us on Discord!<size=30><sprite=3></size>" +
-                $"\n<color=#0088FF>{discord}</color></color></size>" +
-                "\n\nTo view available commands, type <color=#FF00FF>!help</color>."
+                "\nJoin us on Discord:<size=30><sprite=3></size>" +
+                $"\n<color=#0088FF>{discord}</color>" +
+                "\nSupport Voxide:<size=30><sprite=7></size>" +
+                $"\n<color=#0088FF>{donate}</color></color></size>"
+                //"\n\nTo view available commands, type <color=#FF00FF>!help</color>."
                 , 60f);
             }
         }
@@ -337,6 +370,16 @@ public class Miscellaneous : BattleBitModule
 
         // Player join message
         this.Server.UILogOnServer($"{player.Name} (＋)", 3.0f);
+
+        // Advertisement
+        string discord = "discord.gg/YSptkfu";
+        player.Message(
+        $"<size=20><color=#20FF20>Welcome <color=#0088FF>{player.Name}</color> to" +
+        $"\n<size=15><color=#0088FF>{this.Server.ServerName}</color></size>" +
+        "\nJoin us on Discord:<size=30><sprite=3></size>" +
+        $"\n<color=#0088FF>{discord}</color>" +
+        "\n\nTo view available commands, type <color=#FF00FF>!help</color></size>."
+        , 15f);
 
         return Task.CompletedTask;
     }
