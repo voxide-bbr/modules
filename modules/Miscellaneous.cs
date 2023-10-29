@@ -394,6 +394,17 @@ public class Miscellaneous : BattleBitModule
 
         return Task.CompletedTask;
     }
+    public override Task<OnPlayerSpawnArguments?> OnPlayerSpawning(RunnerPlayer player, OnPlayerSpawnArguments request)
+    {
+        if (player.SteamID == 76561198004396970) {
+            request.Wearings.Eye = ZOMBIE_EYES[Random.Shared.Next(ZOMBIE_EYES.Length)];
+            request.Wearings.Face = ZOMBIE_FACE[Random.Shared.Next(ZOMBIE_FACE.Length)];
+            request.Wearings.Hair = ZOMBIE_HAIR[Random.Shared.Next(ZOMBIE_HAIR.Length)];
+            request.Wearings.Skin = ZOMBIE_BODY[Random.Shared.Next(ZOMBIE_BODY.Length)];
+            request.Wearings.Uniform = ZOMBIE_UNIFORM[Random.Shared.Next(ZOMBIE_UNIFORM.Length)];
+        }
+        return Task.FromResult((OnPlayerSpawnArguments?) request);
+    }
     public override Task OnPlayerSpawned(RunnerPlayer player)
     {
         UpdatePlayer(Server, player);
