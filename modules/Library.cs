@@ -87,6 +87,13 @@ public class Library : BattleBitModule
     public static readonly string[] ZOMBIE_ARMOR = new[] { "ANV2_Universal_All_Armor_Null" };
     public static readonly string[] ZOMBIE_BACKPACK = new[] { "ANV2_Universal_All_Backpack_Null" };
     public static readonly string[] ZOMBIE_BELT = new[] { "ANV2_Universal_All_Belt_Null" };
+
+    // Players
+    public static ulong SONICSCREAM = 76561198004396970;
+    // Other
+    public static string MODMAIL = "@Modmail#1931";
+    public static string URL_VOXIDE_DISCORD = "discord.gg/YSptkfu";
+    public static string URL_VOXIDE_DONATE = "v.dgd.cx/donate";
     #endregion Helpers
     #region Classes
     public class Dynamic
