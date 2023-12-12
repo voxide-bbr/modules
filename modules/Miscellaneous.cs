@@ -27,7 +27,8 @@ public class Miscellaneous : BattleBitModule
     [ModuleReference]
     public CommandHandler CommandHandler { get; set; } = null!;
     #region Settings
-    public static bool isPeakHours(bool buffer = false) {
+    public static bool isPeakHours(bool buffer = false)
+    {
         // Get the current time in UTC
         DateTime currentTimeUtc = DateTime.UtcNow;
 
@@ -37,7 +38,8 @@ public class Miscellaneous : BattleBitModule
         // 10 PM local time
         int end = 2;
 
-        if (buffer) {
+        if (buffer)
+        {
             start += 1;
             end -= 1;
         }
@@ -86,7 +88,7 @@ public class Miscellaneous : BattleBitModule
     {
         if (server == null) return;
 
-        string grammar = (server.CurrentPlayerCount+server.InQueuePlayerCount) == 1 ? "person" : "people";
+        string grammar = (server.CurrentPlayerCount + server.InQueuePlayerCount) == 1 ? "person" : "people";
 
         if (Voxide.Library.IsDevelopmentServer(server))
         {
@@ -101,9 +103,11 @@ public class Miscellaneous : BattleBitModule
                 "\nPlease reach out to us on our Discord via our <color=#00FFFF>@Modmail</color> bot." +
                 $"\n\nThere are currently {server.CurrentPlayerCount + server.InQueuePlayerCount} / {GetSoftPlayers(server)} users playing {FirstToUpper(server.Gamemode.ToLower())} on {FirstToUpper(server.Map.ToLower())}."
             ;
-            /*if (newText != server.LoadingScreenText)*/ server.SetLoadingScreenText(newText);
+            /*if (newText != server.LoadingScreenText)*/
+            server.SetLoadingScreenText(newText);
         }
-        else {
+        else
+        {
             string newText = $"<size=30><size=50><b><color=#00FF00>{server.ServerName}</color></size> <sprite=2>" +
                 "\n\n<color=green>XP earned here is saved to your account.</color>" +
                 "\n\nJoin us on discord! <sprite=3>" +
@@ -114,7 +118,8 @@ public class Miscellaneous : BattleBitModule
                 "\nPlease reach out to us on our Discord via our <color=#00FFFF>@Modmail</color> bot." +
                 $"\n\nThere are currently {server.CurrentPlayerCount + server.InQueuePlayerCount} / {GetSoftPlayers(server)} users playing {FirstToUpper(server.Gamemode.ToLower())} on {FirstToUpper(server.Map.ToLower())}."
             ;
-            /*if (newText != server.LoadingScreenText)*/ server.SetLoadingScreenText(newText);
+            /*if (newText != server.LoadingScreenText)*/
+            server.SetLoadingScreenText(newText);
         }
         server.ExecuteCommand("setspeedhackdetection false");
 
@@ -218,7 +223,7 @@ public class Miscellaneous : BattleBitModule
         {
             if (server.CurrentPlayerCount <= 64)
                 player.Modifications.KillFeed = true;
-                
+
             // Restrict vehicles that can be entered into
             player.Modifications.AllowedVehicles = (VehicleType.All ^ VehicleType.Tank);
 
@@ -306,7 +311,7 @@ public class Miscellaneous : BattleBitModule
                 }
             }
         }
-        commandSource.SayToChat(string.Join(",",noises));
+        commandSource.SayToChat(string.Join(",", noises));
     }
 
 
@@ -331,9 +336,11 @@ public class Miscellaneous : BattleBitModule
         UpdateServer(Server);
 
         // Start of match message
-        if (newState == GameState.EndingGame) {
+        if (newState == GameState.EndingGame)
+        {
             IEnumerable<RunnerPlayer> players = Server.AllPlayers;
-            foreach (RunnerPlayer player in players) {
+            foreach (RunnerPlayer player in players)
+            {
                 player.Message("\n\n\n\n" + // Because of the feedback buttons
                 $"<size=20><color=#FFFFFF>Thanks for playing <color=#0088FF>{player.Name}</color> on" +
                 $"\n<size=15><color=#0088FF>{this.Server.ServerName}</color></size>" +
@@ -370,17 +377,25 @@ public class Miscellaneous : BattleBitModule
 
         return Task.CompletedTask;
     }
-    public override Task<OnPlayerSpawnArguments?> OnPlayerSpawning(RunnerPlayer player, OnPlayerSpawnArguments request)
+    public override async Task<OnPlayerSpawnArguments?> OnPlayerSpawning(RunnerPlayer player, OnPlayerSpawnArguments request)
     {
-        List<ulong> zombies = new() {SONICSCREAM};
-        if (zombies.Contains(player.SteamID)) {
+        List<ulong> zombies = new() { SONICSCREAM };
+        if (zombies.Contains(player.SteamID))
+        {
             request.Wearings.Eye = ZOMBIE_EYES[Random.Shared.Next(ZOMBIE_EYES.Length)];
             request.Wearings.Face = ZOMBIE_FACE[Random.Shared.Next(ZOMBIE_FACE.Length)];
             request.Wearings.Hair = ZOMBIE_HAIR[Random.Shared.Next(ZOMBIE_HAIR.Length)];
             request.Wearings.Skin = ZOMBIE_BODY[Random.Shared.Next(ZOMBIE_BODY.Length)];
             //request.Wearings.Uniform = ZOMBIE_UNIFORM[Random.Shared.Next(ZOMBIE_UNIFORM.Length)];
         }
-        return Task.FromResult((OnPlayerSpawnArguments?) request);
+
+        if (IsDevelopmentServer(Server) && player.SteamID == SONICSCREAM && true) {
+            player.Message(
+                "<indent=-50em><line-height=0><nobr><size=10em><mspace=0.5em>. Test                                     ."
+            , 10f);
+            return null;
+        }
+        return request;
     }
     public override Task OnPlayerSpawned(RunnerPlayer player)
     {
@@ -392,16 +407,35 @@ public class Miscellaneous : BattleBitModule
     {
         UpdatePlayer(Server, player);
 
-        string name = player.Name;
+        string name = player.Name.ToUpper();
 
-        player.Message("" +
-            $"<color=#800000><size=20>" +
-            "<size=40><color=#FF0000><b>Y O U   D I E D</b></color></size>" +
-            $"\n\n<sprite=0> To report a problem, please message {MODMAIL} on our Discord server." +
-            "\n\nJoin our Discord: <sprite=3>" +
-            $"\n<size=15>{URL_VOXIDE_DISCORD}</size>" +
-            $"</size></color>"
-        , 5f);
+        string start = $"<width=200em><indent=-100em><pos=-100em><align=left><line-height=0em><mspace=1em><size=1.5em><color=#FFFFFF><smallcaps>";
+        string end = $"</smallcaps></color></mspace></size></line-height></align></pos></indent></width>";
+
+        List<string> phrases = new() {
+            "<color=#642820>YOU DIED</color>",
+            "<color=#922121><b>wasted</b></color>",
+            "<color=#5F0E02>FATALITY</color>",
+            "<color=yellow><b>GAME OVER</b></color>",
+            "<color=#FC0034><i>DEFEAT</i></color>",
+            "<color=#808080>R.I.P</color>",
+        };
+        string phrase = $"<line-height=1em><size=1em>{phrases[Random.Shared.Next(phrases.Count())]}</size></line-height>";
+
+        List<string> lines = new() {
+            $"{start}",
+            $"{phrase}",
+            "<b>Join our Discord!</b>",
+            $"<color=#FF00FF>{URL_VOXIDE_DISCORD}</color>",
+            "<b>Need a moderator?</b><sup><sprite=0></sup>",
+            "Please join the Voxide discord and",
+            $"direct message <color=#E81E63>{MODMAIL}</color>.",
+            $"{end}"
+        };
+
+        string message = String.Join("\n",lines);
+
+        player.Message(message);
         return Task.CompletedTask;
     }
     /*public override Task OnTick()

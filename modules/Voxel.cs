@@ -29,12 +29,12 @@ public class Voxel : BattleBitModule
         public static bool First = true;
         public static int VoxelCounter = 0;
         //                                         volume.SetCuboid(-256, -179, 1, 255, 179, 4, 1);
-        public static MapBoundaries MapBoundariesFortify = new MapBoundaries(256 * 2, 179 * 2 + 1, 100, -256, -179, 1);
+        public static MapBoundaries MapBoundariesFortify = new MapBoundaries((255 * 2) + 1, (179 * 2) + 1, 100, -256, -179, 1);
         // Spawn zones +1 block border: US = -35, -256 -> 34, -179 | RU = -35, 178 -> 34, 255
         // Flags: A = -127, 0 | B = 0, 0 | C = 128, 0
         public static MapBoundaries MapBoundariesTrench = new MapBoundaries(256 * 2, 256 * 2, 100, -256, -256, 1);
         public static MapVolume MapVolumeTrenchProduction = MapBoundariesTrench.getMapVolume();
-        public static MapVolume MapVolumeTrenchDevelopment = MapBoundariesTrench.getMapVolume();
+        //public static MapVolume MapVolumeTrenchDevelopment = MapBoundariesTrench.getMapVolume();
         public static MapVolume MapVolumeFortifyProduction = MapBoundariesFortify.getMapVolume();
         public static void Update(RunnerServer? server = null)
         {
@@ -43,6 +43,7 @@ public class Voxel : BattleBitModule
             if (refresh) VoxelCounter = 0;
             if (First || refresh) // MapVolumeTrenchProduction
             {
+                Console.WriteLine("Started generating voxel trench map...");
                 MapVolume v = MapBoundariesTrench.getMapVolume();
                 int octaves = 5;
                 double scale = 100d; // x / scale
@@ -106,107 +107,68 @@ public class Voxel : BattleBitModule
                 //v.SetCuboid(-5, 178-10, 1, 4, 178, 10, 0);
                 v.SetCuboid(-5 + 1, 179 - 10 - 1, 1, 4 - 1, 179 - 1, (mapHeight / 2) - 1, 0);
                 MapVolumeTrenchProduction = v;
+                Console.WriteLine("Finished generating voxel trench map!");
             }
             if (First || refresh) // MapVolumeFortifyProduction
             {
+                Console.WriteLine("Started generating voxel fortify map...");
                 MapVolume v = MapBoundariesFortify.getMapVolume();
-                int flagRadius = 25;
-                int flagHeight = 50;
-                // Add
-                v.SetSphere(-127, -95, flagHeight, flagRadius, 2);
-                v.SetSphere(0, -95, flagHeight, flagRadius, 2);
-                v.SetSphere(128, -95, flagHeight, flagRadius, 2);
-                v.SetSphere(-127, 96, flagHeight, flagRadius, 2);
-                v.SetSphere(0, 96, flagHeight, flagRadius, 2);
-                v.SetSphere(128, 96, flagHeight, flagRadius, 2);
-                // Hollow out
-                v.SetSphere(-127, -95, flagHeight, flagRadius - 2, 0);
-                v.SetSphere(0, -95, flagHeight, flagRadius - 2, 0);
-                v.SetSphere(128, -95, flagHeight, flagRadius - 2, 0);
-                v.SetSphere(-127, 96, flagHeight, flagRadius - 2, 0);
-                v.SetSphere(0, 96, flagHeight, flagRadius - 2, 0);
-                v.SetSphere(128, 96, flagHeight, flagRadius - 2, 0);
-                // Cut most of sphere except bottom bowl
-                v.SetCuboid(-256, -179, 36, 255, 179, 100, 0);
-                MapVolumeFortifyProduction = v;
-            }
-            if (server != null && IsDevelopmentServer(server)) // MapVolumeTrenchDevelopment
-            {
-                MapVolume v = MapBoundariesTrench.getMapVolume();
-                /*int octaves = 3;
-                double scale = 0.5d;
-                double lacunarity = 2.0d;
-                double persistance = 0.5d;
-                double threshold = 0.775;
-                v.SetCuboidNoise(-128, -128, 1, 127, 127, 25, 3,
-                    5, 100d, lacunarity*2, persistance/2);
-                v.SetCuboidTrees(-128, -128, 1, 127, 127, 25, 3,
-                    octaves, scale, lacunarity, persistance, threshold);
-                v.SetOutsideSphere(0, 0, 0, 164, 128, 0, 1, 100, true, true);*/
 
                 int octaves = 5;
                 double scale = 100d; // x / scale
                 double lacunarity = 2d; // frequency ~> (x/scale)*frequency
-                double persistance = 1.0d; // amplitude ~> ((x/scale)*frequency)*amplitude
+                double persistance = 0.95d; // amplitude ~> ((x/scale)*frequency)*amplitude
 
-                int mapHeight = 24;
-                int flagRadius = 24;
+                int mapHeight = 16;
+                int flagRadiusOuter = 50;
+                int flagRadiusInner = 5;
+                int flagHeight = flagRadiusOuter - 2;
 
-                // A = -127, 0 | B = 0, 0 | C = 128, 0
-                v.SetCuboidNoise(-160, -160, 1, 159, 159, mapHeight, 3, octaves, scale, lacunarity, persistance);
+                //v.SetCuboidNoise(-160, -160, 1, 159, 159, mapHeight, 3, octaves, scale, lacunarity, persistance);
+                //v.SetCuboidNoise(-256, -110, 1, 255, 109, mapHeight, 3, octaves, scale, lacunarity, persistance);
+                //v.SetCuboidNoise(-256, -180, 1, 255, -40, mapHeight, 3, octaves, scale, lacunarity, persistance);
+                //v.SetCuboidNoise(-256, -180, 1, 255, -40, mapHeight, 0, octaves, scale/2, lacunarity, persistance, -1*(mapHeight/2));
+                //v.SetCuboidNoise(-256, 39, 1, 255, 179, mapHeight, 3, octaves, scale, lacunarity, persistance);
+                //v.SetCuboidNoise(-256, 39, 1, 255, 179, mapHeight, 0, octaves, scale/2, lacunarity, persistance, -1*(mapHeight/2));
 
-                // Spawn to Spawn
-                //v.SetCuboid(-5, -256, 1, 4, -10, mapHeight*2, 0);
-                //v.SetCuboid(-5, 10, 1, 4, 255, mapHeight*2, 0);
+                // Land
+                v.SetCuboidNoise(-256, -180, 1, 255, 179, mapHeight, 3, octaves, scale, lacunarity, persistance);
 
-                // Thru flags
-                //v.SetCuboid(-256, -1, 1, 255, 0, 3, 0);
+                // Caves
+                v.SetCuboidNoise(-256, -180, 1, 255, 179, mapHeight/2, 0, octaves-octaves+2, scale-scale+10, lacunarity, persistance, -(mapHeight/4));
 
-                // Central ring
-                v.SetOutsideSphere(0, 0, 1, flagRadius, 5, 0, 1, mapHeight, false, true);
+                // Flags
+                v.SetSphere(-128, -96, flagHeight, flagRadiusOuter, 0, false);
+                v.SetSphere(0, -96, flagHeight, flagRadiusOuter, 0, false);
+                v.SetSphere(127, -96, flagHeight, flagRadiusOuter, 0, false);
+                v.SetSphere(-128, 95, flagHeight, flagRadiusOuter, 0, false);
+                v.SetSphere(0, 95, flagHeight, flagRadiusOuter, 0, false);
+                v.SetSphere(127, 95, flagHeight, flagRadiusOuter, 0, false);
 
-                // Flag A & C
-                v.SetOutsideSphere(-127, 0, 1, flagRadius, 5, 0, 1, mapHeight, false, true);
-                v.SetOutsideSphere(128, 0, 1, flagRadius, 5, 0, 1, mapHeight, false, true);
+                // No mans land
+                //v.SetCuboid(-256, -25, 1, 256, 24, mapHeight, 0);
+
+                /*
+                v.SetOutsideSphere(-127, -95, flagHeight, flagRadiusOuter, flagRadiusInner, 0, 1, mapHeight, false, true);
+                v.SetOutsideSphere(0, -95, flagHeight, flagRadiusOuter, flagRadiusInner, 0, 1, mapHeight, false, true);
+                v.SetOutsideSphere(128, -95, flagHeight, flagRadiusOuter, flagRadiusInner, 0, 1, mapHeight, false, true);
+                v.SetOutsideSphere(-127, 96, flagHeight, flagRadiusOuter, flagRadiusInner, 0, 1, mapHeight, false, true);
+                v.SetOutsideSphere(0, 96, flagHeight, flagRadiusOuter, flagRadiusInner, 0, 1, mapHeight, false, true);
+                v.SetOutsideSphere(128, 96, flagHeight, flagRadiusOuter, flagRadiusInner, 0, 1, mapHeight, false, true);
+                */
 
                 // Trim map into a circle
-                v.SetOutsideSphere(0, 0, 0, 162, 160, 0, 1, mapHeight, true, true);
+                //v.SetOutsideSphere(0, 0, 0, 258, 256, 0, 1, mapHeight, true, true);
 
                 // Keep tree away from flags
-                List<Vector2> trees = new()
-                {
-                    new Vector2(-128, 0), new Vector2(0, 0), new Vector2(128, 0)
-                };
-                v.SetCuboidTrees(-128, -128, 2, 127, 127, mapHeight, 3, 3, 0.5d, 2.0d, 0.5d, 0.773d, 15, trees);
+                //List<Vector2> trees = new()
+                //{
+                //    new Vector2(-128, -95), new Vector2(0, -95), new Vector2(128, -95), new Vector2(-128, 96), new Vector2(0, 96), new Vector2(128, 96)
+                //};
+                //v.SetCuboidTrees(-256, -160, 2, 256, 159, mapHeight, 3, 3, 0.5d, 2.0d, 0.5d, 0.773d, 20, trees);
 
-                // Spawn zones +1 block border: US = -35, -256 -> 34, -179 | RU = -35, 178 -> 34, 255
-                // US Spawn outer walls
-                v.SetCuboid(-35 - 10, -256 - 10, 1, 34 + 10, -179 + 10, mapHeight, 3, false, true);
-                // US Spawn floors
-                v.SetCuboid(-35 - 10, -256 - 10, mapHeight / 2, 34 + 10, -179 + 10, mapHeight / 2, 3);
-                //v.SetCuboid(-35-10, -256-10, mapHeight, 34+10, -179+10, mapHeight, 3);
-                // US Spawn inner clearing
-                v.SetCuboid(-35 - 5, -256 - 5, 1, 34 + 5, -179 + 5, mapHeight / 2, 0);
-                // US Spawn inner walls
-                v.SetCuboid(-35, -256 - 1, 1, 34, -179, 1, 3, false, true);
-                // Main hall
-                //v.SetCuboid(-5, -179, 1, 4, -179+10, 10, 0);
-                v.SetCuboid(-5 + 1, -179 + 1, 1, 4 - 1, -179 + 10 + 1, (mapHeight / 2) - 1, 0);
-
-                // RU Spawn outer walls
-                v.SetCuboid(-35 - 10, 178 - 10, 1, 34 + 10, 255 + 10, mapHeight, 3, false, true);
-                // RU Spawn floors
-                v.SetCuboid(-35 - 10, 178 - 10, mapHeight / 2, 34 + 10, 255 + 10, mapHeight / 2, 3);
-                //v.SetCuboid(-35-10, 178-10, mapHeight, 34+10, 255+10, mapHeight, 3);
-                // RU Spawn inner clearing
-                v.SetCuboid(-35 - 5, 178 - 5, 1, 34 + 5, 255 + 5, mapHeight, 0);
-                // RU Spawn inner walls
-                v.SetCuboid(-35, 178, 1, 34, 255 + 1, mapHeight / 2, 3, false, true);
-                // Main hall
-                //v.SetCuboid(-5, 178-10, 1, 4, 178, 10, 0);
-                v.SetCuboid(-5 + 1, 178 - 10 - 1, 1, 4 - 1, 178 - 1, (mapHeight / 2) - 1, 0);
-
-                MapVolumeTrenchDevelopment = v;
+                MapVolumeFortifyProduction = v;
+                Console.WriteLine("Finished generating voxel fortify map!");
             }
             if (First) First = false;
             VoxelCounter += 1;
@@ -230,7 +192,7 @@ public class Voxel : BattleBitModule
             else if ((oldState == GameState.EndingGame) && newState != GameState.EndingGame)
             {
                 Utility.halt = false;
-                SpawnVoxelWorld(this.Server, true);
+                SpawnVoxelWorld(this.Server, true, 1);
                 Statics.VoxelCounter += 1;
             }
         }
@@ -440,7 +402,7 @@ public class Voxel : BattleBitModule
 
             return result;
         }
-        public bool SetCuboidNoise(int x1, int y1, int z1, int x2, int y2, int z2, int type, int octaves = 1, double scale = 1.0d, double lacunarity = 1.0d, double persistance = 1.0d)
+        public bool SetCuboidNoise(int x1, int y1, int z1, int x2, int y2, int z2, int type, int octaves = 1, double scale = 1.0d, double lacunarity = 1.0d, double persistance = 1.0d, int zOffset = 0)
         {
             OpenSimplexNoise noise = new();
 
@@ -463,7 +425,7 @@ public class Voxel : BattleBitModule
                     {
                         if (z <= zMax)
                         {
-                            if (!SetVoxelGame(new Vector3(x, y, z), type))
+                            if (!SetVoxelGame(new Vector3(x, y, z + zOffset), type))
                                 success = false;
                         }
                     }
@@ -608,6 +570,11 @@ public class Voxel : BattleBitModule
 
     public static class Utility
     {
+        public static bool isValidCoordinate(int x, int y, int z)
+        {
+            int offset = 0;
+            return x >= -256+offset && x < 256-offset && y >= -256+offset && y < 256-offset && z >= 1+offset && z < 100-offset;
+        }
         public static Random Random = new();
         public async static Task<List<Vector3>> LoadVoxelPointsFromJsonFile(string filePath)
         {
@@ -642,29 +609,33 @@ public class Voxel : BattleBitModule
         public static bool halt = false;
         public static Task SetVoxel(RunnerServer server, int x, int y, int z, int type)
         {
-            // Types: <=0: air, 1: solid, 2: solid_orange
-            // Vector3(x, z, y)
-            if (type <= 0)
-                server.DestroyVoxelBlock(new Vector3(x, z, y));
-            else if (type == 1)
-                server.PlaceVoxelBlock(new Vector3(x, z, y), new VoxelBlockData());
-            else if (type == 2)
+            if (type == 3 || Utility.isValidCoordinate(x, y, z))
             {
-                VoxelBlockData VoxelBlockData = new VoxelBlockData();
-                VoxelBlockData.TextureID = VoxelTextures.NeonOrange;
-                server.PlaceVoxelBlock(new Vector3(x, z, y), VoxelBlockData);
-            }
-            else if (type == 3)
-            {
-                bool even = (int)Random.NextInt64(1000) % 2 == 0;
-                if (even) type = 1;
-                else type = 2;
-                SetVoxel(server, x, y, z, type);
+                // Types: <=0: air, 1: solid, 2: solid_orange
+                // Vector3(x, z, y)
+                if (type <= 0)
+                    server.DestroyVoxelBlock(new Vector3(x, z, y));
+                else if (type == 1)
+                    server.PlaceVoxelBlock(new Vector3(x, z, y), new VoxelBlockData());
+                else if (type == 2)
+                {
+                    VoxelBlockData VoxelBlockData = new VoxelBlockData();
+                    VoxelBlockData.TextureID = VoxelTextures.NeonOrange;
+                    server.PlaceVoxelBlock(new Vector3(x, z, y), VoxelBlockData);
+                }
+                else if (type == 3)
+                {
+                    bool even = (int)Random.NextInt64(1000) % 2 == 0;
+                    if (even) type = 1;
+                    else type = 2;
+                    SetVoxel(server, x, y, z, type);
+                }
             }
             return Task.CompletedTask;
         }
         public async static Task SetVoxels(RunnerServer server, MapVolume volume, int mode = 0, int? delay = 0, bool immediate = false)
         {
+            Console.WriteLine("Starting setVoxels...");
             if (delay != null && delay > 0)
                 await Task.Delay((int)delay);
             // modes 0=normal 1=place 2=remove 3=placeremove 4=removeplace
@@ -693,7 +664,7 @@ public class Voxel : BattleBitModule
                             count_voxel++;
 
                             // Introduce a delay between voxel placements
-                            if (!immediate && (count_voxel % 1000) == 0)
+                            if (!immediate && (count_voxel % 100) == 0)
                             {
                                 //await Console.Out.WriteLineAsync($"{count_voxel} voxels altered");
                                 await Task.Delay(delayMilliseconds);
@@ -707,7 +678,8 @@ public class Voxel : BattleBitModule
                     }
                 }
             }
-            //await Console.Out.WriteLineAsync($"{count_loop} voxels checked, {count_voxel} voxels altered.");
+            await Console.Out.WriteLineAsync($"{count_loop} voxels checked, {count_voxel} voxels altered.");
+            Console.WriteLine("Finished setVoxels!");
         }
     }
 
@@ -719,8 +691,10 @@ public class Voxel : BattleBitModule
     {
         return Voxide.Library.IsVoxelServer(Server);
     }
-    public static async void SpawnVoxelWorld(RunnerServer server, bool immediate = false)
+    public static async void SpawnVoxelWorld(RunnerServer server, bool immediate = false, int delayMs = 0)
     {
+        Console.WriteLine("Starting spawnVoxelWorld...");
+        if (delayMs != 0) await Task.Delay(delayMs);
         if (IsVoxelServer(server))
         {
             if (server.Gamemode.ToLower().Contains("fortify"))
@@ -730,8 +704,11 @@ public class Voxel : BattleBitModule
         }
         else if (IsDevelopmentServer(server)) //&& server.Map.ToLower().Contains("voxel"))
         {
-            //if (server.Gamemode.ToLower().Contains("trench"))
-            await Utility.SetVoxels(server, Statics.MapVolumeTrenchDevelopment, 1, 0, immediate);
+            if (server.Gamemode.ToLower().Contains("fortify"))
+                await Utility.SetVoxels(server, Statics.MapVolumeFortifyProduction, 1, 0, immediate);
+            else if (server.Gamemode.ToLower().Contains("trench"))
+                await Utility.SetVoxels(server, Statics.MapVolumeTrenchProduction, 1, 0, immediate);
         }
+        Console.WriteLine("Finished spawnVoxelWorld!");
     }
 }
